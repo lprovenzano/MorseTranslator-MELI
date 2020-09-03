@@ -28,7 +28,7 @@ public class RomanValidation implements IRomanValidation {
 
     @Override
     public boolean isHumanText(String humanText) {
-        return humanText.matches("^[a-zA-Z0-9.]+$");
+        return humanText.matches("^[a-zA-Z0-9.\\s]+$");
     }
 
 }

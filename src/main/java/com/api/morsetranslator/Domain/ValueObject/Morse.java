@@ -1,12 +1,14 @@
 package com.api.morsetranslator.Domain.ValueObject;
 
-
 import com.api.morsetranslator.Domain.Shared.Bit;
 import com.api.morsetranslator.Domain.ValueObject.Interfaces.ITranslation;
+
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
+@Component
 public class Morse implements ITranslation {
 
     private String morseWordTranslated;
@@ -62,7 +64,7 @@ public class Morse implements ITranslation {
          return Alphabet.indexOf(letter);
     }
 
-    public String Translate(int positionLetter){
+    public String translate(int positionLetter){
         String foundLetter = "";
         boolean isInAlphabetRange = positionLetter >= 0 && positionLetter<=Alphabet.toArray().length;
 
@@ -72,7 +74,8 @@ public class Morse implements ITranslation {
         return foundLetter;
     }
 
-    public void morseFlush(){
+    @Override
+    public void Flush(){
         morseWordTranslated = "";
     }
 
@@ -80,7 +83,7 @@ public class Morse implements ITranslation {
     public String toString() {
         String morseTranslation = morseWordTranslated.trim();
 
-        morseFlush();
+        Flush();
 
         return morseTranslation;
     }

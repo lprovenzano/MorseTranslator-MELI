@@ -1,29 +1,40 @@
 package com.api.morsetranslator.Application.Services;
 
+import com.api.morsetranslator.Application.Services.Interfaces.IBinaryService;
 import com.api.morsetranslator.Application.Services.Interfaces.IParserService;
 import com.api.morsetranslator.Domain.Shared.Bit;
 import com.api.morsetranslator.Domain.ValueObject.Interfaces.ITranslation;
 import com.api.morsetranslator.Domain.ValueObject.Morse;
 import com.api.morsetranslator.Domain.ValueObject.Roman;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.naming.OperationNotSupportedException;
 import java.util.HashMap;
 
 @Service
 public class MorseService implements IParserService {
 
     private HashMap<Integer, Integer> memoization;
-    private Morse morse;
-    private Roman roman;
+    private ITranslation _morse;
+    private ITranslation _roman;
+    private IBinaryService _binaryService;
 
-    public MorseService(){
-        roman = new Roman();
-        morse = new Morse();
+    @Autowired
+    public MorseService(IBinaryService binaryService,
+                        Morse morse,
+                        Roman roman)
+    {
+        _binaryService = binaryService;
+        _roman = roman;
+        _morse = morse;
         memoization = new HashMap<>();
     }
 
     @Override
-    public String decodeBits2Morse(int[] bits) {
+    public String decodeBits2Morse(String binary) throws OperationNotSupportedException {
+
+        int[] bits = _binaryService.getBitsArrayFromString(binary);
 
         for (int i = 0; i < bits.length; i++)
         {
@@ -45,7 +56,7 @@ public class MorseService implements IParserService {
                 throw exception;
             }
         }
-        return morse.toString();
+        return _morse.toString();
     }
 
     @Override
@@ -53,7 +64,7 @@ public class MorseService implements IParserService {
     {
         try{
 
-            return translate(morseWord, roman);
+            return translate(morseWord, _roman);
 
         }catch(Exception exception){
             throw exception;
@@ -64,7 +75,7 @@ public class MorseService implements IParserService {
     public String translate2Morse(String romanWord) {
         try{
 
-            return translate(romanWord, morse);
+            return translate(romanWord, _morse);
 
         }catch(Exception exception){
             throw exception;
@@ -73,17 +84,17 @@ public class MorseService implements IParserService {
 
     @Override
     public String translate(String word, ITranslation translation){
-        String translatedWord = "";
 
         String[] lettersToTranslate = getLettersInWordToTranslate(word, translation);
 
         for (int i=0; i<lettersToTranslate.length; i++)
         {
             String letter = lettersToTranslate[i];
-            translatedWord += getTranslatedLetter(letter, translation);
+            String translatedLetter = getTranslatedLetter(letter, translation);
+            translation.addLetter(translatedLetter);
         }
 
-        return translatedWord;
+        return translation.toString();
     }
 
     private void memorizeCountOfBits(int key)
@@ -107,13 +118,14 @@ public class MorseService implements IParserService {
         return memoization.get(bit);
     }
 
-    private void generateMorseTranslation(int bit, int quantityPulses){
+    private void generateMorseTranslation(int bit, int quantityPulses) throws OperationNotSupportedException {
 
         Bit digit = bit == Bit.PULSE.getValue()? Bit.PULSE : Bit.PAUSE;
 
-        String morseLetter = morse.getLetter(digit, quantityPulses);
+        String morseLetter = _morse.getLetter(digit, quantityPulses) ;
 
-        morse.addLetter(morseLetter);
+        _morse.addLetter(morseLetter);
+
     }
 
     private String[] getLettersInWordToTranslate(String word, ITranslation translation ){
@@ -126,8 +138,8 @@ public class MorseService implements IParserService {
     }
 
     private String getTranslatedLetter(String letter, ITranslation translation){
-        int index = translation.equals(roman)? morse.indexOfLetter(letter) : roman.indexOfLetter(letter);
-        return translation.Translate(index);
+        int index = translation.equals(_roman)? _morse.indexOfLetter(letter) : _roman.indexOfLetter(letter);
+        return translation.translate(index);
     }
 
 }

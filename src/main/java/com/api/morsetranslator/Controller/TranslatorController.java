@@ -19,19 +19,16 @@ import java.util.HashMap;
 public class TranslatorController {
 
     private IParserService _parserService;
-    private IBinaryService _binaryService;
     private IBinaryValidation _binaryValidations;
     private IMorseValidation _morseValidations;
     private IRomanValidation _romanValidation;
 
     public TranslatorController(IParserService parserService,
-                                IBinaryService binaryService,
                                 IBinaryValidation binaryValidations,
                                 IMorseValidation morseValidations,
                                 IRomanValidation romanValidation)
     {
         _parserService = parserService;
-        _binaryService = binaryService;
         _binaryValidations = binaryValidations;
         _morseValidations = morseValidations;
         _romanValidation = romanValidation;
@@ -95,9 +92,7 @@ public class TranslatorController {
                 return ResponseEntity.badRequest()
                         .body(new JsonResult<HashMap<String, String>>().Serialize(hasErrors));
 
-            int[] bits = _binaryService.getBitsArrayFromString(request.text);
-
-            String resultTranslation = _parserService.decodeBits2Morse(bits);
+            String resultTranslation = _parserService.decodeBits2Morse(request.text);
 
             Response response = new Response(resultTranslation, HttpStatus.OK.value());
 
