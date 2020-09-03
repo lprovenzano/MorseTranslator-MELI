@@ -6,7 +6,6 @@ import com.api.morsetranslator.Application.DTO.Response;
 import com.api.morsetranslator.Application.DataValidation.Interfaces.IBinaryValidation;
 import com.api.morsetranslator.Application.DataValidation.Interfaces.IMorseValidation;
 import com.api.morsetranslator.Application.DataValidation.Interfaces.IRomanValidation;
-import com.api.morsetranslator.Application.Services.Interfaces.IBinaryService;
 import com.api.morsetranslator.Application.Services.Interfaces.IParserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,82 +25,80 @@ public class TranslatorController {
     public TranslatorController(IParserService parserService,
                                 IBinaryValidation binaryValidations,
                                 IMorseValidation morseValidations,
-                                IRomanValidation romanValidation)
-    {
+                                IRomanValidation romanValidation) {
         _parserService = parserService;
         _binaryValidations = binaryValidations;
         _morseValidations = morseValidations;
         _romanValidation = romanValidation;
     }
 
-    @RequestMapping(value = "2morse", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(
+            value = "2morse",
+            method = RequestMethod.POST,
+            produces = "application/json")
     public ResponseEntity<String> translate2morse(@RequestBody Request request) {
 
+        Response response = new Response();
+
         try {
-
-            String text = request.text.toUpperCase();
-
-            HashMap<String, String> hasErrors = _romanValidation.ValidateRequest(text);
+            HashMap<String, String> hasErrors = _romanValidation.ValidateRequest(request.text);
 
             if (!hasErrors.isEmpty())
-                return ResponseEntity.badRequest()
-                        .body(new JsonResult<HashMap<String, String>>().Serialize(hasErrors));
+                return response.get(hasErrors, HttpStatus.BAD_REQUEST);
 
-            String resultTranslation = _parserService.translate2Morse(text);
+            String resultTranslation = _parserService.translate2Morse(request.text);
 
-            Response response = new Response(resultTranslation, HttpStatus.OK.value());
-
-            return ResponseEntity.ok()
-                    .body(new JsonResult<Response>().Serialize(response));
+            return response.get(resultTranslation, HttpStatus.OK);
 
         } catch (Exception exception) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new JsonResult<String>().Serialize("Internal server error"));
+            return response.get("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @RequestMapping(value = "2text", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(
+            value = "2text",
+            method = RequestMethod.POST,
+            produces = "application/json")
     public ResponseEntity<String> translate2text(@RequestBody Request request) {
+
+        Response response = new Response();
 
         try {
             HashMap<String, String> hasErrors = _morseValidations.ValidateRequest(request.text);
 
             if (!hasErrors.isEmpty())
-                return ResponseEntity.badRequest()
-                        .body(new JsonResult<HashMap<String, String>>().Serialize(hasErrors));
+                return response.get(hasErrors, HttpStatus.BAD_REQUEST);
 
             String resultTranslation = _parserService.translate2Human(request.text);
 
-            Response response = new Response(resultTranslation, HttpStatus.OK.value());
-
-            return ResponseEntity.ok()
-                    .body(new JsonResult<Response>().Serialize(response));
+            return response.get(resultTranslation, HttpStatus.OK);
 
         } catch (Exception exception) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new JsonResult<String>().Serialize("Internal server error"));
+            return response.get("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @RequestMapping(value = "decodeBits/2morse", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(
+            value = "decodeBits/2morse",
+            method = RequestMethod.POST,
+            produces = "application/json")
     public ResponseEntity<String> decodeBits2morse(@RequestBody Request request) {
+
+        Response response = new Response();
+
         try {
+
             HashMap<String, String> hasErrors = _binaryValidations.ValidateRequest(request.text);
 
             if (!hasErrors.isEmpty())
-                return ResponseEntity.badRequest()
-                        .body(new JsonResult<HashMap<String, String>>().Serialize(hasErrors));
+                return response.get(hasErrors, HttpStatus.BAD_REQUEST);
 
             String resultTranslation = _parserService.decodeBits2Morse(request.text);
 
-            Response response = new Response(resultTranslation, HttpStatus.OK.value());
-
-            return ResponseEntity.ok()
-                    .body(new JsonResult<Response>().Serialize(response));
+            return response.get(resultTranslation, HttpStatus.OK);
 
         } catch (Exception exception) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new JsonResult<String>().Serialize("Internal server error"));
+            return response.get("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }

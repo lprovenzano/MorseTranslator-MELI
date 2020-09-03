@@ -7,6 +7,7 @@ import com.api.morsetranslator.Domain.ValueObject.Interfaces.ITranslation;
 import com.api.morsetranslator.Domain.ValueObject.Morse;
 import com.api.morsetranslator.Domain.ValueObject.Roman;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.naming.OperationNotSupportedException;
@@ -16,14 +17,19 @@ import java.util.HashMap;
 public class MorseService implements IParserService {
 
     private HashMap<Integer, Integer> memoization;
+
+    @Qualifier("morse")
     private ITranslation _morse;
+
+    @Qualifier("roman")
     private ITranslation _roman;
+
     private IBinaryService _binaryService;
 
     @Autowired
     public MorseService(IBinaryService binaryService,
-                        Morse morse,
-                        Roman roman)
+                        ITranslation morse,
+                        ITranslation roman)
     {
         _binaryService = binaryService;
         _roman = roman;
@@ -75,7 +81,7 @@ public class MorseService implements IParserService {
     public String translate2Morse(String romanWord) {
         try{
 
-            return translate(romanWord, _morse);
+            return translate(romanWord.toUpperCase(), _morse);
 
         }catch(Exception exception){
             throw exception;

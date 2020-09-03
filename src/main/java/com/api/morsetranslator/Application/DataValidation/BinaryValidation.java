@@ -29,4 +29,5 @@ public class BinaryValidation implements IBinaryValidation {
     public boolean isEmpty(String binary) {
         return binary.isEmpty() || binary.isBlank();
     }
+
 }

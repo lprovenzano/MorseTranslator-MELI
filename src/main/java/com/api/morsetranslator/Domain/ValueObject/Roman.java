@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class Roman implements ITranslation {
 
     private String romanWordTranslation;
-    private ArrayList<String> Alphabet = new ArrayList<>(Arrays.asList("A", "B", "C", "D",
+    private final ArrayList<String> Alphabet = new ArrayList<>(Arrays.asList("A", "B", "C", "D",
             "E", "F", "G", "H", "I", "J", "K", "L",
             "M", "N", "O", "P", "Q", "R", "S", "T", "U",
             "V", "W", "X", "Y", "Z", "0", "1",
