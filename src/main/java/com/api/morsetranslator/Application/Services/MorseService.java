@@ -4,7 +4,6 @@ import com.api.morsetranslator.Application.Services.Interfaces.IBinaryService;
 import com.api.morsetranslator.Application.Services.Interfaces.IParserService;
 import com.api.morsetranslator.Domain.Shared.Bit;
 import com.api.morsetranslator.Domain.ValueObject.Interfaces.ITranslation;
-import com.api.morsetranslator.Domain.ValueObject.Morse;
 import com.api.morsetranslator.Domain.ValueObject.Roman;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
